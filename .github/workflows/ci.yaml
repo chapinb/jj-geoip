@@ -25,10 +25,8 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      - name: Setup Poetry + cache ⚡
-        # You may pin to the exact commit or the version.
-        # uses: benjavicente/setup-poetry@5d5a117534fff193d5fdb2706979104e4fbed6c6
-        uses: benjavicente/setup-poetry@v0.1
+      - name: Poetry install
+        uses: knowsuchagency/poetry-install@v2
 
       - name: Test
         run: pytest --cov --cov-report term --cov-branch
