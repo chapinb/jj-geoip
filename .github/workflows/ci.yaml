@@ -32,3 +32,6 @@ jobs:
 
       - name: Test
         run: pytest --cov --cov-report term --cov-branch
+
+      - name: Build
+        run: poetry build
