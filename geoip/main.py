@@ -5,7 +5,7 @@ import sys
 from typing import Optional
 
 from geoip import csv_report, load_env
-from geoip.ipinfo import Enrich
+from geoip.ipinfo import BulkEnrich, Enrich
 
 __author__ = "Chapin Bryce"
 __date__ = "2023-09-19"
@@ -95,7 +95,12 @@ def entry(cli_args: Optional[list[str]] = None) -> None:
     setup_logging(logger, args.log, args.verbose)
 
     logger.info("Starting enrichment.")
-    client = Enrich(api_key=os.environ["API_KEY"])
+
+    if len(args.IPS) > 1:
+        logger.info("Multiple IPs detected. Batching requests.")
+        client = BulkEnrich(api_key=os.environ["API_KEY"])
+    else:
+        client = Enrich(api_key=os.environ["API_KEY"])
     enriched_data = client.lookup(args.IPS)
     logger.info("Enrichment complete. Generating report.")
     csv_report.create_report(args.REPORT_NAME, enriched_data)
