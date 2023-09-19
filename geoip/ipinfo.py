@@ -4,7 +4,7 @@ import requests
 URL = "https://ipinfo.io"
 
 
-def location_formatter(record: dict[str, str]) -> None:
+def location_formatter(record: dict[str, str]) -> dict[str, str]:
     """Format the IPInfo.io response for our users."""
 
     # Break the lat and lon into separate fields
@@ -29,6 +29,8 @@ def location_formatter(record: dict[str, str]) -> None:
         loc_data.append(country)
     # Join only the available resolutions together
     record["loc"] = ", ".join(loc_data)
+
+    return record
 
 
 class Enrich:
