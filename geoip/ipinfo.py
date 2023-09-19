@@ -37,7 +37,7 @@ class Enrich:
     def __init__(
         self, api_key: Optional[str] = None, formatter: Optional[Callable] = None
     ):
-        self.__api_key = api_key
+        self._api_key = api_key
 
         if formatter:
             self.formatter = formatter
@@ -47,7 +47,7 @@ class Enrich:
     def ask_ipinfo_io(self, ip_address: str) -> dict[str, str]:
         resp = requests.get(
             f"{URL}/{ip_address}",
-            params={"token": self.__api_key},
+            params={"token": self._api_key},
             headers={"Content-Type": "application/json"},
         )
         resp.raise_for_status()
