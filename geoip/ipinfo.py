@@ -44,7 +44,7 @@ class Enrich:
         else:
             self.formatter = location_formatter
 
-    def ask_ipinfo_io(self, ip_address: str) -> dict[str, str]:
+    def query_ipinfo(self, ip_address: str) -> dict[str, str]:
         resp = requests.get(
             f"{URL}/{ip_address}",
             params={"token": self._api_key},
@@ -59,7 +59,7 @@ class Enrich:
 
         results = []
         for ip in ip_addresses:
-            result = self.ask_ipinfo_io(ip)
+            result = self.query_ipinfo(ip)
             self.formatter(result)
             results.append(result)
 
@@ -73,7 +73,7 @@ class BulkEnrich(Enrich):
         super().__init__(api_key, formatter)
         self.batch_size = 1000
 
-    def ask_ipinfo_io(self, ip_address: list[str]) -> dict[str, dict[str, str]]:
+    def query_ipinfo(self, ip_address: list[str]) -> dict[str, dict[str, str]]:
         resp = requests.post(
             f"{URL}/batch",
             json=ip_address,
@@ -90,7 +90,7 @@ class BulkEnrich(Enrich):
         results = []
         for i in range(0, len(ip_addresses), self.batch_size):
             batch = ip_addresses[i : i + self.batch_size]
-            enrichments = self.ask_ipinfo_io(batch)
+            enrichments = self.query_ipinfo(batch)
             for enrichment in enrichments.values():
                 self.formatter(enrichment)
                 results.append(enrichment)
