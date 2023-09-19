@@ -42,7 +42,7 @@ class Enrich:
         else:
             self.formatter = location_formatter
 
-    def ask_ipinfo_io(self, ip_address) -> dict[str, str]:
+    def ask_ipinfo_io(self, ip_address: str) -> dict[str, str]:
         resp = requests.get(
             f"{URL}/{ip_address}",
             params={"token": self.__api_key},
