@@ -1,3 +1,4 @@
+import json
 from unittest import TestCase
 import responses
 from geoip.ipinfo import BulkEnrich, Enrich, URL, location_formatter
@@ -133,3 +134,22 @@ class IpInfoBulkTestCase(TestCase):
             # Assertions on request
             self.assertEqual(1, len(rsps.calls))
             self.assertEqual(rsps.calls[0].request.url, f"{URL}/batch")
+
+    def test_ip_batching(self):
+        with responses.RequestsMock() as rsps:
+            rsps.upsert(
+                responses.POST,
+                f"{URL}/batch",
+                json={},
+                status=200,
+            )
+            many_items = list(str(x) for x in range(0, 10001))
+
+            BulkEnrich().lookup(many_items)
+
+            # Assertions on request
+            self.assertEqual(11, len(rsps.calls))
+            for call in rsps.calls:
+                self.assertEqual(call.request.url, f"{URL}/batch")
+                request_data = json.loads(call.request.body)
+                self.assertLessEqual(len(request_data), 1000)

@@ -71,6 +71,7 @@ class BulkEnrich(Enrich):
         self, api_key: Optional[str] = None, formatter: Optional[Callable] = None
     ):
         super().__init__(api_key, formatter)
+        self.batch_size = 1000
 
     def ask_ipinfo_io(self, ip_address: list[str]) -> dict[str, dict[str, str]]:
         resp = requests.post(
@@ -86,5 +87,12 @@ class BulkEnrich(Enrich):
         if isinstance(ip_addresses, str):
             ip_addresses = [ip_addresses]
 
-        results = self.ask_ipinfo_io(ip_addresses)
-        return [self.formatter(result) for result in results.values()]
+        results = []
+        for i in range(0, len(ip_addresses), self.batch_size):
+            batch = ip_addresses[i : i + self.batch_size]
+            enrichments = self.ask_ipinfo_io(batch)
+            for enrichment in enrichments.values():
+                self.formatter(enrichment)
+                results.append(enrichment)
+
+        return results
