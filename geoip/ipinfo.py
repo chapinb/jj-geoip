@@ -64,3 +64,27 @@ class Enrich:
             results.append(result)
 
         return results
+
+
+class BulkEnrich(Enrich):
+    def __init__(
+        self, api_key: Optional[str] = None, formatter: Optional[Callable] = None
+    ):
+        super().__init__(api_key, formatter)
+
+    def ask_ipinfo_io(self, ip_address: list[str]) -> dict[str, dict[str, str]]:
+        resp = requests.post(
+            f"{URL}/batch",
+            json=ip_address,
+            params={"token": self._api_key},
+            headers={"Content-Type": "application/json"},
+        )
+        resp.raise_for_status()
+        return resp.json()
+
+    def lookup(self, ip_addresses: [str, list[str]]) -> list[dict[str, str]]:
+        if isinstance(ip_addresses, str):
+            ip_addresses = [ip_addresses]
+
+        results = self.ask_ipinfo_io(ip_addresses)
+        return [self.formatter(result) for result in results.values()]
